@@ -4,19 +4,25 @@
 
 package frc.robot.subsystems;
 
+//Importing built in wpi packages
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//Importing third-party libraries
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.kauailabs.navx.frc.AHRS;
+//Importing local folder
 import static frc.robot.Constants.*;
 
+/**
+*A class to handle all of the drivetrain motors and other functions.
+*driveMecanum is the only function here at the moment.
+*/
 public class Drivetrain extends SubsystemBase {
-  
+
   //Define motor controllers
   private CANSparkMax frontLeftMotor;
   private CANSparkMax frontRightMotor;
@@ -33,7 +39,7 @@ public class Drivetrain extends SubsystemBase {
   /** Creates a new Drivetrain. */
   public Drivetrain() {
 
-    
+
 
     // Initialize motor controllers
     frontLeftMotor = new CANSparkMax(FRONT_LEFT_MOTOR_ID, MotorType.kBrushless);
@@ -42,7 +48,7 @@ public class Drivetrain extends SubsystemBase {
     backRightMotor = new CANSparkMax(BACK_RIGHT_MOTOR_ID, MotorType.kBrushless);
 
     // Invert back motors
-    backLeftMotor.setInverted(false);
+    backLeftMotor.setInverted(true);
     backRightMotor.setInverted(true);
 
     // Initialize and Calibrates gyroscope
@@ -50,9 +56,9 @@ public class Drivetrain extends SubsystemBase {
 
     // Initialize mecanum drive
     mecanumDrive = new MecanumDrive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
-   
+
   }
-  
+
   public void driveMecanum(double leftJoyX, double leftJoyY, double rightJoyX, boolean useGyro)
   {
     frontLeftMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -61,9 +67,9 @@ public class Drivetrain extends SubsystemBase {
     backRightMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
     //Set properties of drive
-    mecanumDrive.setSafetyEnabled(false);	
+    mecanumDrive.setSafetyEnabled(false);
     mecanumDrive.setMaxOutput(MAX_MOTOR_OUTPUT);
-    
+
     //Get joystick values and scale
     speedX = -leftJoyY * DRIVE_SPEED;
     speedY = -leftJoyX * DRIVE_SPEED;
@@ -74,15 +80,15 @@ public class Drivetrain extends SubsystemBase {
 
     //This condition only allows the robot to move if the gyroscope has finished calibrating.
     if (gyroscope.isCalibrating() == false) {
-      
+
       //This condition tests if it should factor the gyroscope into driving.
       //This value can be changed in the Constants.java file.
       if(useGyro) {
         //If using the pi gyro board, mod the returned value by 360 to avoid a spinning robot
         //gyroAngle = Robot.gyroAngle.getDouble(0) % 360.0;
-    
+
         mecanumDrive.driveCartesian(speedX, speedY, speedZ, gyroAngle);
-    
+
       } else {
 
         mecanumDrive.driveCartesian(speedX, speedY, speedZ);
